@@ -101,11 +101,10 @@
 
 // Fullscreen transition window waveform width
 .main-nowPlayingView-mainContainer > div > div > div > div {
-   --overlap-window-padding: 15vw;
-   --transition-controls-width: 50vw;
+   // --overlap-window-padding: 15vw;
 
    @media(min-width: 2600px) {
-      --overlap-window-padding: 20vw;
+      // --overlap-window-padding: 20vw;
 
       &:nth-child(5) > div {
          width: 60%;
@@ -114,7 +113,7 @@
    }
 
    @media(min-width: 4000px) {
-      --overlap-window-padding: 25vw;
+      // --overlap-window-padding: 25vw;
 
       &:nth-child(5) > div {
          width: 40%;
