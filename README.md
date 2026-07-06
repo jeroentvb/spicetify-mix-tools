@@ -1,4 +1,6 @@
-# Spicetify Mix Tools
+# Spicetify Sort BPM
+
+![preview](docs/preview.png)
 
 DJ-style playlist tools for the Spotify desktop client, via [Spicetify](https://spicetify.app).
 
@@ -15,6 +17,10 @@ sort/view button). Clicking it offers two options:
 Tracks without BPM data (local files, podcasts, unavailable tracks) are moved to the end
 rather than being sorted into a wrong position, and the count is reported.
 
+> **Note:** the BPM values are read from the playlist's **BPM column**, so that column must be
+> visible before sorting. If it isn't, enable it via the playlist's column/view settings
+> (the "..." / column header menu). Without the BPM column showing, no BPM data can be read.
+
 ## Development
 
 ```sh
@@ -30,9 +36,9 @@ npm run lint
 
 ```sh
 npm run build:local
-# copy dist/mix-tools.js to the Spicetify Extensions folder:
+# copy dist/sort-bpm.js to the Spicetify Extensions folder:
 #   macOS/Linux: ~/.config/spicetify/Extensions
 #   Windows:     %appdata%\spicetify\Extensions
-spicetify config extensions mix-tools.js
+spicetify config extensions sort-bpm.js
 spicetify apply
 ```

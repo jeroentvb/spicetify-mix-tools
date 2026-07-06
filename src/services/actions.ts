@@ -21,11 +21,11 @@ function notify(message: string, isError = false): void {
 async function prepare(uri: string) {
    const items = await getContents(uri);
    if (items.length === 0) {
-      notify('Mix Tools: this playlist is empty', true);
+      notify('Sort BPM: this playlist is empty', true);
       return null;
    }
 
-   notify(`Mix Tools: reading BPM for ${items.length} tracks…`);
+   notify(`Sort BPM: reading BPM for ${items.length} tracks…`);
    setButtonBusy('0%');
    const bpmMap = await harvestColumnBpm(items.length, (found, total) => {
       setButtonBusy(`${Math.min(99, Math.round((found / total) * 100))}%`);
@@ -33,7 +33,7 @@ async function prepare(uri: string) {
    const result = sortByBpm(items, bpmMap, DIRECTION);
 
    if (result.sortedCount === 0) {
-      notify('Mix Tools: no BPM found — is the BPM column visible on this playlist?', true);
+      notify('Sort BPM: no BPM found — is the BPM column visible on this playlist?', true);
       return null;
    }
 
@@ -55,10 +55,10 @@ function summary(sortedCount: number, skipped: number): string {
 /** Sort by BPM by reordering the current playlist in place. */
 export async function sortReorder(): Promise<void> {
    const uri = getCurrentPlaylistUri();
-   if (!uri) return notify('Mix Tools: open a playlist first', true);
+   if (!uri) return notify('Sort BPM: open a playlist first', true);
 
    if (!(await canModify(uri))) {
-      return notify('Mix Tools: you can only reorder playlists you own', true);
+      return notify('Sort BPM: you can only reorder playlists you own', true);
    }
 
    try {
@@ -68,10 +68,10 @@ export async function sortReorder(): Promise<void> {
       await reorderInPlace(uri, prepared.result.ordered, (done, total) => {
          setButtonBusy(`${Math.round((done / total) * 100)}%`);
       });
-      notify(`Mix Tools: ${summary(prepared.result.sortedCount, prepared.result.skipped.length)}`);
+      notify(`Sort BPM: ${summary(prepared.result.sortedCount, prepared.result.skipped.length)}`);
    } catch (err) {
-      console.error('Mix Tools reorder failed:', err);
-      notify('Mix Tools: failed to reorder playlist (see console)', true);
+      console.error('Sort BPM reorder failed:', err);
+      notify('Sort BPM: failed to reorder playlist (see console)', true);
    } finally {
       setButtonBusy(null);
    }
@@ -80,7 +80,7 @@ export async function sortReorder(): Promise<void> {
 /** Sort by BPM into a brand new playlist, leaving the original untouched. */
 export async function sortToNewPlaylist(): Promise<void> {
    const uri = getCurrentPlaylistUri();
-   if (!uri) return notify('Mix Tools: open a playlist first', true);
+   if (!uri) return notify('Sort BPM: open a playlist first', true);
 
    try {
       const prepared = await prepare(uri);
@@ -89,11 +89,11 @@ export async function sortToNewPlaylist(): Promise<void> {
       const name = `${await getPlaylistName(uri)} (BPM)`;
       const newUri = await createSortedPlaylist(uri, prepared.result.ordered, name);
 
-      notify(`Mix Tools: created "${name}" · ${summary(prepared.result.sortedCount, prepared.result.skipped.length)}`);
+      notify(`Sort BPM: created "${name}" · ${summary(prepared.result.sortedCount, prepared.result.skipped.length)}`);
       Spicetify.Platform.History.push(`/playlist/${newUri.split(':').pop()}`);
    } catch (err) {
-      console.error('Mix Tools new-playlist failed:', err);
-      notify('Mix Tools: failed to create sorted playlist (see console)', true);
+      console.error('Sort BPM new-playlist failed:', err);
+      notify('Sort BPM: failed to create sorted playlist (see console)', true);
    } finally {
       setButtonBusy(null);
    }

@@ -1,4 +1,4 @@
-.mix-tools-button {
+.sort-bpm-button {
    display: inline-flex;
    align-items: center;
    gap: 6px;
@@ -34,7 +34,7 @@
       color: var(--text-base, #fff);
 
       svg {
-         animation: mix-tools-pulse 1s ease-in-out infinite;
+         animation: sort-bpm-pulse 1s ease-in-out infinite;
       }
 
       &:hover {
@@ -44,12 +44,12 @@
    }
 }
 
-@keyframes mix-tools-pulse {
+@keyframes sort-bpm-pulse {
    0%, 100% { opacity: 0.4; }
    50% { opacity: 1; }
 }
 
-.mix-tools-menu {
+.sort-bpm-menu {
    position: fixed;
    z-index: 9999;
    min-width: 220px;
@@ -57,10 +57,10 @@
    border-radius: 8px;
    background: var(--background-elevated-base, #282828);
    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-   animation: mix-tools-fade 0.12s ease;
+   animation: sort-bpm-fade 0.12s ease;
 }
 
-.mix-tools-menu-item {
+.sort-bpm-menu-item {
    display: flex;
    flex-direction: column;
    gap: 2px;
@@ -77,18 +77,18 @@
       background: var(--background-elevated-highlight, rgba(255, 255, 255, 0.1));
    }
 
-   .mix-tools-menu-item-label {
+   .sort-bpm-menu-item-label {
       font-size: 0.875rem;
       font-weight: 500;
    }
 
-   .mix-tools-menu-item-sub {
+   .sort-bpm-menu-item-sub {
       font-size: 0.75rem;
       color: var(--text-subdued, #b3b3b3);
    }
 }
 
-@keyframes mix-tools-fade {
+@keyframes sort-bpm-fade {
    from {
       opacity: 0;
       transform: translateY(-4px);

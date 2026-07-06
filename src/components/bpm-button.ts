@@ -1,7 +1,7 @@
 import { sortReorder, sortToNewPlaylist } from '../services/actions';
 
-export const BUTTON_ID = 'mix-tools-bpm-button';
-const MENU_ID = 'mix-tools-bpm-menu';
+export const BUTTON_ID = 'sort-bpm-bpm-button';
+const MENU_ID = 'sort-bpm-bpm-menu';
 
 interface MenuAction {
    label: string;
@@ -37,14 +37,14 @@ function openMenu(anchor: HTMLElement): void {
 
    const menu = document.createElement('div');
    menu.id = MENU_ID;
-   menu.className = 'mix-tools-menu';
+   menu.className = 'sort-bpm-menu';
 
    for (const action of ACTIONS) {
       const item = document.createElement('button');
-      item.className = 'mix-tools-menu-item';
+      item.className = 'sort-bpm-menu-item';
       item.type = 'button';
-      item.innerHTML = `<span class="mix-tools-menu-item-label">${action.label}</span>` +
-         `<span class="mix-tools-menu-item-sub">${action.sublabel}</span>`;
+      item.innerHTML = `<span class="sort-bpm-menu-item-label">${action.label}</span>` +
+         `<span class="sort-bpm-menu-item-sub">${action.sublabel}</span>`;
       item.addEventListener('click', () => {
          closeMenu();
          action.run();
@@ -76,7 +76,7 @@ const IDLE_HTML = `${ICON}<span>BPM</span>`;
 export function createBpmButton(): HTMLButtonElement {
    const button = document.createElement('button');
    button.id = BUTTON_ID;
-   button.className = 'mix-tools-button';
+   button.className = 'sort-bpm-button';
    button.type = 'button';
    button.setAttribute('aria-label', 'Sort by BPM');
    button.setAttribute('title', 'Sort by BPM');
@@ -98,12 +98,12 @@ export function setButtonBusy(label: string | null): void {
 
    if (label === null) {
       button.disabled = false;
-      button.classList.remove('mix-tools-button--busy');
+      button.classList.remove('sort-bpm-button--busy');
       button.innerHTML = IDLE_HTML;
       button.setAttribute('aria-label', 'Sort by BPM');
    } else {
       button.disabled = true;
-      button.classList.add('mix-tools-button--busy');
+      button.classList.add('sort-bpm-button--busy');
       button.innerHTML = `${ICON}<span>${label}</span>`;
       button.setAttribute('aria-label', `Sorting by BPM… ${label}`);
    }

@@ -170,13 +170,13 @@ export async function reorderInPlace(
       }
       if (typeof api.resync === 'function') await api.resync(uri);
    } catch (err) {
-      console.warn('Mix Tools: batched move failed; verifying and maybe falling back', err);
+      console.warn('Sort BPM: batched move failed; verifying and maybe falling back', err);
    }
 
    const after = await getContents(uri);
    if (sameOrder(after, targetUids)) return;
 
-   console.info('Mix Tools: in-place moves did not fully apply; falling back to remove + re-add');
+   console.info('Sort BPM: in-place moves did not fully apply; falling back to remove + re-add');
    await replaceInOrder(uri, ordered);
 }
 

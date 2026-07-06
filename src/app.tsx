@@ -13,7 +13,7 @@ async function main() {
    setupInjection();
 
    // Debug helpers for the BPM-correctness verification step (see README).
-   (window as typeof window & { mixTools?: Record<string, unknown> }).mixTools = {
+   (window as typeof window & { sortBpm?: Record<string, unknown> }).sortBpm = {
       getCurrentPlaylistUri,
       getContents,
       harvestColumnBpm,

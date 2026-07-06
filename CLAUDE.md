@@ -32,7 +32,7 @@ Everything about Spotify's internals here was reverse-engineered this way and is
 
 ```sh
 npm run watch        # rebuild on change, output into the local Spicetify Extensions folder
-npm run build:local  # minified build into ./dist/mix-tools.js
+npm run build:local  # minified build into ./dist/sort-bpm.js
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint .  (lint:fix to autofix)
 ```

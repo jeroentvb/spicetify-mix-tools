@@ -1,8 +1,9 @@
 {
-    "name": "Mix Tools",
-    "description": "DJ-style playlist tools for Spotify. Sort a playlist by BPM, either in place or into a new playlist.",
-    "main": "mix-tools.js",
+    "name": "Sort BPM",
+    "description": "Sort a playlist by BPM, either in place or into a new playlist.",
+    "main": "sort-bpm.js",
     "readme": "README.md",
     "authors": [{ "name": "jeroentvb", "url": "https://github.com/jeroentvb" }],
-    "branch": "dist"
+    "branch": "dist",
+    "preview": "docs/preview.png"
 }
