@@ -30,3 +30,9 @@ export const SORT_BUTTON = [
    // Newer clients label it with the current order, e.g. "Custom order"
    'button[aria-label*="order"]',
 ];
+
+/** The playlist header's total playtime, e.g. "3 hr 43 min". */
+export const HEADER_FULL_TIME = [
+   '[data-testid="entity-header"] .main-entityHeader-metadataFullTime',
+   '.main-entityHeader-metadataFullTime',
+];

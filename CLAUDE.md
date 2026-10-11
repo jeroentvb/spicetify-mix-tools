@@ -81,7 +81,7 @@ feature and `TECHNICAL.md` for the reverse-engineering write-up (BPM harvesting 
 and the batched in-place reorder that preserves "date added"). **`TECHNICAL.md` is gitignored** — read
 it locally; it's the most useful doc in the repo.
 
-When a Spotify update breaks the extension, the version-dependent assumptions are isolated to three
+When a Spotify update breaks the extension, the version-dependent assumptions are isolated to four
 files — start there, and confirm the new reality by querying the live client over CDP:
 
 - `src/constants/selectors.ts` — DOM selectors / testids (action bar, sort button), as ordered
@@ -92,3 +92,6 @@ files — start there, and confirm the new reality by querying the live client o
   which is the fastest way to re-discover the shape after a client update.
 - `src/services/playlist.ts` — `Spicetify.Platform.PlaylistAPI` method names and the modification
   payload shape used for reordering.
+- `src/services/mix.ts` — mix-mode detection and the `Spicetify.Platform.PlaylistMixingAPI`
+  transition lookups (`getCustomTransitionForTrackPair` / `getAutoTransitionForTrackPair` and the
+  `overlap` shape) behind the mixed-playtime label. `getMixStats(uri)` is on `window.sortBpm`.

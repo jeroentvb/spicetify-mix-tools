@@ -2,6 +2,7 @@ import { ACTION_BAR, SORT_BUTTON } from '../constants/selectors';
 import { getCurrentPlaylistUri } from '../services/current-uri';
 import { queryFirst } from '../utils/wait-for-element';
 import { BUTTON_ID, createBpmButton } from './bpm-button';
+import { ensureMixTime } from './mix-time';
 
 /**
  * Ensure the BPM button is present on playlist pages and absent elsewhere.
@@ -50,10 +51,12 @@ export function setupInjection(): void {
       requestAnimationFrame(() => {
          scheduled = false;
          ensureButton();
+         ensureMixTime();
       });
    };
 
    ensureButton();
+   ensureMixTime();
 
    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
    Spicetify.Platform?.History?.listen?.(schedule);

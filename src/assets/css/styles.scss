@@ -160,3 +160,66 @@
       }
    }
 }
+
+.sort-bpm-mix-time {
+   // Plain inline (not flex), so the leading space before the bullet survives.
+   white-space: nowrap;
+}
+
+.sort-bpm-mix-info {
+   display: inline-flex;
+   align-items: center;
+   margin-left: 4px;
+   padding: 2px;
+   vertical-align: middle;
+   border: none;
+   border-radius: 50%;
+   background: transparent;
+   color: inherit;
+   cursor: pointer;
+   transition: color 0.15s ease;
+
+   &:hover,
+   &:focus-visible {
+      color: var(--text-base, #fff);
+   }
+}
+
+.sort-bpm-mix-popup {
+   min-width: 240px;
+   padding: 12px 14px;
+   color: var(--text-base, #fff);
+   font-size: 0.875rem;
+
+   .sort-bpm-mix-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 3px 0;
+      font-variant-numeric: tabular-nums;
+
+      > span:first-child {
+         color: var(--text-subdued, #b3b3b3);
+      }
+
+      &--strong {
+         font-weight: 700;
+
+         > span:first-child {
+            color: inherit;
+         }
+      }
+   }
+
+   .sort-bpm-mix-divider {
+      margin: 6px 0;
+      border: none;
+      border-top: 1px solid var(--essential-subdued, rgba(255, 255, 255, 0.2));
+   }
+
+   .sort-bpm-mix-note {
+      margin: 8px 0 0;
+      font-size: 0.75rem;
+      color: var(--text-subdued, #b3b3b3);
+   }
+}
