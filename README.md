@@ -4,8 +4,10 @@
 
 DJ-style playlist tools for the Spotify desktop client, via [Spicetify](https://spicetify.app).
 
-It sorts a playlist for mixing — **by BPM (tempo)**, or **by musical key on the Camelot
-wheel with BPM ascending inside each key** — and shows how long a mixed playlist really
+> Disclaimer: this extension was built using AI
+
+It sorts a playlist for mixing. By BPM (tempo), or by musical key on the Camelot
+wheel with BPM ascending inside each key, and shows how long a mixed playlist really
 plays once its transitions are taken into account.
 
 A **BPM** button is added to the playlist action bar (between "Search in playlist" and the
