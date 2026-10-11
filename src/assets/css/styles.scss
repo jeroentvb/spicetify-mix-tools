@@ -223,3 +223,8 @@
       color: var(--text-subdued, #b3b3b3);
    }
 }
+
+// Host element our React roots render into; it shouldn't affect the surrounding layout.
+.mix-tools-root {
+   display: contents;
+}

@@ -70,9 +70,12 @@ npm run typecheck    # tsc --noEmit
 npm run lint         # eslint .  (lint:fix to autofix)
 ```
 
-Note: despite the `.tsx`/React JSX config, the extension builds its UI with **plain DOM APIs** — there
-is no React tree of our own. `Spicetify` is an ambient global (typed in `src/types/`, which lint and
-your edits should treat as vendored).
+The UI (`src/components/*.tsx`) is **React**, using Spotify's own copy: spicetify-creator maps `react` /
+`react-dom` imports onto `Spicetify.React` / `Spicetify.ReactDOM` (React 18, so `@types/react@18`). We
+don't own Spotify's tree, so `inject.tsx` / `mix-time.tsx` create small host elements in Spotify's DOM
+and render a separate root into each via `src/utils/mount.ts`. Menus and popups are portaled to
+`<body>`. `Spicetify` is an ambient global (typed in `src/types/`, which lint and your edits should
+treat as vendored).
 
 ## What the code does & where the fragile parts live
 
