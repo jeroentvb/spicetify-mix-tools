@@ -1,4 +1,4 @@
-# Spicetify Sort BPM
+# Spicetify Mix Tools
 
 ![preview](docs/preview.png)
 
@@ -70,9 +70,9 @@ npm run lint
 
 ```sh
 npm run build:local
-# copy dist/sort-bpm.js to the Spicetify Extensions folder:
+# copy dist/mix-tools.js to the Spicetify Extensions folder:
 #   macOS/Linux: ~/.config/spicetify/Extensions
 #   Windows:     %appdata%\spicetify\Extensions
-spicetify config extensions sort-bpm.js
+spicetify config extensions mix-tools.js
 spicetify apply
 ```

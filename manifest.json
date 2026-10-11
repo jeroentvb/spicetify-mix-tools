@@ -1,7 +1,7 @@
 {
-    "name": "Sort BPM and key",
+    "name": "Mix Tools",
     "description": "Sort a playlist by BPM and key (camelot), either in place or into a new playlist. Shows the real playtime of mixed playlists.",
-    "main": "sort-bpm.js",
+    "main": "mix-tools.js",
     "readme": "README.md",
     "authors": [{ "name": "jeroentvb", "url": "https://github.com/jeroentvb" }],
     "branch": "dist",

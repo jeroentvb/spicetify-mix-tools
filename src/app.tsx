@@ -14,7 +14,7 @@ async function main() {
    setupInjection();
 
    // Debug helpers for the BPM/key-correctness verification step (see TECHNICAL.md).
-   (window as typeof window & { sortBpm?: Record<string, unknown> }).sortBpm = {
+   (window as typeof window & { mixTools?: Record<string, unknown> }).mixTools = {
       getCurrentPlaylistUri,
       getContents,
       getMixStats,

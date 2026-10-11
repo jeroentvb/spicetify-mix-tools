@@ -164,7 +164,7 @@ export async function harvestColumnData(
 /**
  * Dump the raw React props of the first rendered track row, unfiltered.
  *
- * Exposed on `window.sortBpm` because re-discovering this shape in DevTools is the first
+ * Exposed on `window.mixTools` because re-discovering this shape in DevTools is the first
  * thing needed whenever a Spotify update breaks harvesting — see TECHNICAL.md.
  */
 export function inspectRowItem(): RowItem | null {

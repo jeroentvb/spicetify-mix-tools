@@ -7,13 +7,13 @@ import {
 import { getCurrentPlaylistUri } from '../services/current-uri';
 import { canModify } from '../services/playlist';
 
-export const BUTTON_ID = 'sort-bpm-bpm-button';
-const MENU_ID = 'sort-bpm-bpm-menu';
-const SUBMENU_ID = 'sort-bpm-bpm-submenu';
+export const BUTTON_ID = 'mix-tools-bpm-button';
+const MENU_ID = 'mix-tools-bpm-menu';
+const SUBMENU_ID = 'mix-tools-bpm-submenu';
 
 /** Gap kept between any menu and the viewport edge. */
 const EDGE_MARGIN = 8;
-/** Mirrors `.sort-bpm-menu`'s padding, so a submenu's first row lines up with its parent row. */
+/** Mirrors `.mix-tools-menu`'s padding, so a submenu's first row lines up with its parent row. */
 const MENU_PADDING = 4;
 /** Horizontal overlap with the parent menu, so the pointer can cross without leaving both. */
 const SUBMENU_OVERLAP = 2;
@@ -82,7 +82,7 @@ function scheduleClose(): void {
 
 /** The focusable rows of a menu, in visual order. */
 function rows(menu: Element): HTMLElement[] {
-   return Array.from(menu.querySelectorAll<HTMLElement>('.sort-bpm-menu-item'));
+   return Array.from(menu.querySelectorAll<HTMLElement>('.mix-tools-menu-item'));
 }
 
 function closeSubmenu(): void {
@@ -90,7 +90,7 @@ function closeSubmenu(): void {
    document.getElementById(SUBMENU_ID)?.remove();
    if (openParent) {
       openParent.setAttribute('aria-expanded', 'false');
-      openParent.classList.remove('sort-bpm-menu-item--open');
+      openParent.classList.remove('mix-tools-menu-item--open');
       openParent = null;
    }
 }
@@ -170,9 +170,9 @@ function onKeydown(e: KeyboardEvent): void {
       case 'ArrowRight':
       case 'Enter':
       case ' ': {
-         if (!(active instanceof HTMLElement) || !active.classList.contains('sort-bpm-menu-item')) return;
+         if (!(active instanceof HTMLElement) || !active.classList.contains('mix-tools-menu-item')) return;
          // ArrowRight only opens a submenu — it must not activate a leaf.
-         const isParent = active.classList.contains('sort-bpm-menu-item--parent');
+         const isParent = active.classList.contains('mix-tools-menu-item--parent');
          if (e.key === 'ArrowRight' && !isParent) return;
 
          // Activate through click() rather than letting the button do it natively: this
@@ -205,7 +205,7 @@ const CHEVRON = '<svg viewBox="0 0 16 16" width="12" height="12" fill="currentCo
 function createItem(label: string, sublabel: string, isParent: boolean): HTMLButtonElement {
    const item = document.createElement('button');
    item.type = 'button';
-   item.className = isParent ? 'sort-bpm-menu-item sort-bpm-menu-item--parent' : 'sort-bpm-menu-item';
+   item.className = isParent ? 'mix-tools-menu-item mix-tools-menu-item--parent' : 'mix-tools-menu-item';
    item.setAttribute('role', 'menuitem');
    item.tabIndex = -1; // Roving tabindex: the arrow keys move focus, Tab doesn't.
    if (isParent) {
@@ -213,9 +213,9 @@ function createItem(label: string, sublabel: string, isParent: boolean): HTMLBut
       item.setAttribute('aria-expanded', 'false');
    }
    // Every label is a hard-coded constant — nothing user-supplied reaches this markup.
-   item.innerHTML = `<span class="sort-bpm-menu-item-label">${label}</span>` +
-      `<span class="sort-bpm-menu-item-sub">${sublabel}</span>` +
-      (isParent ? `<span class="sort-bpm-menu-item-chevron" aria-hidden="true">${CHEVRON}</span>` : '');
+   item.innerHTML = `<span class="mix-tools-menu-item-label">${label}</span>` +
+      `<span class="mix-tools-menu-item-sub">${sublabel}</span>` +
+      (isParent ? `<span class="mix-tools-menu-item-chevron" aria-hidden="true">${CHEVRON}</span>` : '');
    return item;
 }
 
@@ -229,14 +229,14 @@ function isDisabled(item: HTMLElement): boolean {
  */
 function disableItem(item: HTMLElement, sublabel: string): void {
    item.setAttribute('aria-disabled', 'true');
-   item.classList.add('sort-bpm-menu-item--disabled');
-   const sub = item.querySelector('.sort-bpm-menu-item-sub');
+   item.classList.add('mix-tools-menu-item--disabled');
+   const sub = item.querySelector('.mix-tools-menu-item-sub');
    if (sub) sub.textContent = sublabel;
    if (openParent === item) closeSubmenu();
 }
 
 function positionSubmenu(parent: HTMLElement, submenu: HTMLElement): void {
-   const root = parent.closest('.sort-bpm-menu');
+   const root = parent.closest('.mix-tools-menu');
    const rootRect = (root ?? parent).getBoundingClientRect();
    const parentRect = parent.getBoundingClientRect();
    const { offsetWidth: width, offsetHeight: height } = submenu;
@@ -271,7 +271,7 @@ function openSubmenu(parent: HTMLElement, entry: MenuEntry, focusFirst: boolean)
 
    const submenu = document.createElement('div');
    submenu.id = SUBMENU_ID;
-   submenu.className = 'sort-bpm-menu sort-bpm-menu--submenu';
+   submenu.className = 'mix-tools-menu mix-tools-menu--submenu';
    submenu.setAttribute('role', 'menu');
 
    for (const leaf of entry.items) {
@@ -293,7 +293,7 @@ function openSubmenu(parent: HTMLElement, entry: MenuEntry, focusFirst: boolean)
    positionSubmenu(parent, submenu);
 
    parent.setAttribute('aria-expanded', 'true');
-   parent.classList.add('sort-bpm-menu-item--open');
+   parent.classList.add('mix-tools-menu-item--open');
    openParent = parent;
 
    if (focusFirst) rows(submenu)[0]?.focus({ preventScroll: true });
@@ -305,7 +305,7 @@ function openMenu(anchor: HTMLElement, fromKeyboard: boolean): void {
 
    const menu = document.createElement('div');
    menu.id = MENU_ID;
-   menu.className = 'sort-bpm-menu';
+   menu.className = 'mix-tools-menu';
    menu.setAttribute('role', 'menu');
 
    const uri = getCurrentPlaylistUri();
@@ -363,7 +363,7 @@ const IDLE_LABEL = 'Sort by BPM or key';
 export function createBpmButton(): HTMLButtonElement {
    const button = document.createElement('button');
    button.id = BUTTON_ID;
-   button.className = 'sort-bpm-button';
+   button.className = 'mix-tools-button';
    button.type = 'button';
    button.setAttribute('aria-label', IDLE_LABEL);
    button.setAttribute('aria-haspopup', 'menu');
@@ -387,12 +387,12 @@ export function setButtonBusy(label: string | null): void {
 
    if (label === null) {
       button.disabled = false;
-      button.classList.remove('sort-bpm-button--busy');
+      button.classList.remove('mix-tools-button--busy');
       button.innerHTML = IDLE_HTML;
       button.setAttribute('aria-label', IDLE_LABEL);
    } else {
       button.disabled = true;
-      button.classList.add('sort-bpm-button--busy');
+      button.classList.add('mix-tools-button--busy');
       button.innerHTML = `${ICON}<span>${label}</span>`;
       button.setAttribute('aria-label', `Sorting playlist… ${label}`);
    }

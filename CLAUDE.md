@@ -47,11 +47,11 @@ only produces a bundle and does **not** exercise the code, so use the client to 
   Return plain JSON-serializable values (e.g. `outerHTML.slice(...)`, key lists), not DOM nodes.
 - **To learn about Spotify's internals**, such as a `Platform.*` API shape, whether a global still
   exists (`Object.keys(Spicetify)`), a DOM node or testid, or a row's fiber props
-  (`window.sortBpm.inspectRowItem()`), query the client this way instead of guessing.
+  (`window.mixTools.inspectRowItem()`), query the client this way instead of guessing.
 - **To verify a change**, run `npm run build` (it writes into the Spicetify Extensions folder), reload
   the client by evaluating `location.reload()`, wait a few seconds, then query the DOM or
-  `window.sortBpm`. The button is injected asynchronously, so a check made right after load can miss it.
-- `window.sortBpm` is set only once `main()` has finished starting up. If it's missing but the
+  `window.mixTools`. The button is injected asynchronously, so a check made right after load can miss it.
+- `window.mixTools` is set only once `main()` has finished starting up. If it's missing but the
   extension's `<style>` tag is present, `main()` is stuck in its startup wait loop.
 - Reading state and reloading are fine. Ask before doing anything that changes the user's data, such as
   running a sort/reorder or creating playlists through the UI or `PlaylistAPI`.
@@ -65,7 +65,7 @@ version-fragile.
 
 ```sh
 npm run watch        # rebuild on change, output into the local Spicetify Extensions folder
-npm run build:local  # minified build into ./dist/sort-bpm.js
+npm run build:local  # minified build into ./dist/mix-tools.js
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint .  (lint:fix to autofix)
 ```
@@ -88,10 +88,10 @@ files — start there, and confirm the new reality by querying the live client o
   candidate lists.
 - `src/services/track-columns.ts` — the track-row selectors and the React-fiber prop shape that
   BPM and musical key are scraped from (`item.bpm` and `item.key.camelotKey`). Its
-  `inspectRowItem()` is exposed on `window.sortBpm` to dump a row's raw props in DevTools,
+  `inspectRowItem()` is exposed on `window.mixTools` to dump a row's raw props in DevTools,
   which is the fastest way to re-discover the shape after a client update.
 - `src/services/playlist.ts` — `Spicetify.Platform.PlaylistAPI` method names and the modification
   payload shape used for reordering.
 - `src/services/mix.ts` — mix-mode detection and the `Spicetify.Platform.PlaylistMixingAPI`
   transition lookups (`getCustomTransitionForTrackPair` / `getAutoTransitionForTrackPair` and the
-  `overlap` shape) behind the mixed-playtime label. `getMixStats(uri)` is on `window.sortBpm`.
+  `overlap` shape) behind the mixed-playtime label. `getMixStats(uri)` is on `window.mixTools`.

@@ -18,7 +18,7 @@ const DIRECTION: SortDirection = 'asc';
 /** Everything that differs between the sort modes, so the workflow below stays single-copy. */
 interface SortModeSpec {
    mode: SortMode;
-   /** Notification prefix, e.g. `Sort BPM: …`. */
+   /** Notification prefix, e.g. `Mix Tools: …`. */
    prefix: string;
    /** What the harvest is reading, for the "reading … for N tracks" notice. */
    reading: string;
@@ -79,7 +79,7 @@ function notify(spec: SortModeSpec, message: string, isError = false): void {
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
          },
       }, text);
-      snackbar.enqueueCustomSnackbar(element, { keyPrefix: 'sort-bpm', autoHideDuration: isError ? 6000 : 4000 });
+      snackbar.enqueueCustomSnackbar(element, { keyPrefix: 'mix-tools', autoHideDuration: isError ? 6000 : 4000 });
       return;
    }
 

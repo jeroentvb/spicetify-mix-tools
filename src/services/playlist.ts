@@ -253,10 +253,10 @@ export async function reorderInPlace(
    try {
       if (await convergeByMoves(uri, targetUids, onProgress)) return;
    } catch (err) {
-      console.warn('Sort BPM: batched move failed; falling back', err);
+      console.warn('Mix Tools: batched move failed; falling back', err);
    }
 
-   console.info('Sort BPM: in-place moves did not fully apply; falling back to remove + re-add');
+   console.info('Mix Tools: in-place moves did not fully apply; falling back to remove + re-add');
    await replaceInOrder(uri, ordered);
 
    // Re-adding in batches can race the same way, so straighten out any strays. The

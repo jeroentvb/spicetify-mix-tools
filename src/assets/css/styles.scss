@@ -1,4 +1,4 @@
-.sort-bpm-button {
+.mix-tools-button {
    display: inline-flex;
    align-items: center;
    gap: 6px;
@@ -34,7 +34,7 @@
       color: var(--text-base, #fff);
 
       svg {
-         animation: sort-bpm-pulse 1s ease-in-out infinite;
+         animation: mix-tools-pulse 1s ease-in-out infinite;
       }
 
       &:hover {
@@ -44,12 +44,12 @@
    }
 }
 
-@keyframes sort-bpm-pulse {
+@keyframes mix-tools-pulse {
    0%, 100% { opacity: 0.4; }
    50% { opacity: 1; }
 }
 
-.sort-bpm-menu {
+.mix-tools-menu {
    position: fixed;
    z-index: 9999;
    min-width: 220px;
@@ -57,7 +57,7 @@
    border-radius: 8px;
    background: var(--background-elevated-base, #282828);
    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-   animation: sort-bpm-fade 0.12s ease;
+   animation: mix-tools-fade 0.12s ease;
 
    // Leaf labels ("by key + BPM") are shorter than the destination rows above them.
    &--submenu {
@@ -65,7 +65,7 @@
    }
 }
 
-.sort-bpm-menu-item {
+.mix-tools-menu-item {
    position: relative; // Anchors the chevron.
    display: flex;
    flex-direction: column;
@@ -102,22 +102,22 @@
          background: transparent;
       }
 
-      .sort-bpm-menu-item-chevron {
+      .mix-tools-menu-item-chevron {
          display: none;
       }
    }
 
-   .sort-bpm-menu-item-label {
+   .mix-tools-menu-item-label {
       font-size: 0.875rem;
       font-weight: 500;
    }
 
-   .sort-bpm-menu-item-sub {
+   .mix-tools-menu-item-sub {
       font-size: 0.75rem;
       color: var(--text-subdued, #b3b3b3);
    }
 
-   .sort-bpm-menu-item-chevron {
+   .mix-tools-menu-item-chevron {
       position: absolute;
       top: 50%;
       right: 10px;
@@ -127,7 +127,7 @@
    }
 }
 
-@keyframes sort-bpm-fade {
+@keyframes mix-tools-fade {
    from {
       opacity: 0;
       transform: translateY(-4px);
@@ -161,12 +161,12 @@
    }
 }
 
-.sort-bpm-mix-time {
+.mix-tools-mix-time {
    // Plain inline (not flex), so the leading space before the bullet survives.
    white-space: nowrap;
 }
 
-.sort-bpm-mix-info {
+.mix-tools-mix-info {
    display: inline-flex;
    align-items: center;
    margin-left: 4px;
@@ -185,13 +185,13 @@
    }
 }
 
-.sort-bpm-mix-popup {
+.mix-tools-mix-popup {
    min-width: 240px;
    padding: 12px 14px;
    color: var(--text-base, #fff);
    font-size: 0.875rem;
 
-   .sort-bpm-mix-row {
+   .mix-tools-mix-row {
       display: flex;
       justify-content: space-between;
       gap: 24px;
@@ -211,13 +211,13 @@
       }
    }
 
-   .sort-bpm-mix-divider {
+   .mix-tools-mix-divider {
       margin: 6px 0;
       border: none;
       border-top: 1px solid var(--essential-subdued, rgba(255, 255, 255, 0.2));
    }
 
-   .sort-bpm-mix-note {
+   .mix-tools-mix-note {
       margin: 8px 0 0;
       font-size: 0.75rem;
       color: var(--text-subdued, #b3b3b3);

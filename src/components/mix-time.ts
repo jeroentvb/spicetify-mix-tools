@@ -3,8 +3,8 @@ import { getCurrentPlaylistUri } from '../services/current-uri';
 import { getMixStats, isMixEnabled, type MixStats } from '../services/mix';
 import { queryFirst } from '../utils/wait-for-element';
 
-const LABEL_ID = 'sort-bpm-mix-time';
-const POPUP_ID = 'sort-bpm-mix-popup';
+const LABEL_ID = 'mix-tools-mix-time';
+const POPUP_ID = 'mix-tools-mix-popup';
 
 /** Gap kept between the popup and the viewport edge. */
 const EDGE_MARGIN = 8;
@@ -76,7 +76,7 @@ function onKeydown(e: KeyboardEvent): void {
 }
 
 function row(label: string, value: string, strong = false): string {
-   return `<div class="sort-bpm-mix-row${strong ? ' sort-bpm-mix-row--strong' : ''}">` +
+   return `<div class="mix-tools-mix-row${strong ? ' mix-tools-mix-row--strong' : ''}">` +
       `<span>${label}</span><span>${value}</span></div>`;
 }
 
@@ -85,7 +85,7 @@ function openPopup(anchor: HTMLElement, stats: MixStats): void {
 
    const popup = document.createElement('div');
    popup.id = POPUP_ID;
-   popup.className = 'sort-bpm-menu sort-bpm-mix-popup';
+   popup.className = 'mix-tools-menu mix-tools-mix-popup';
    popup.setAttribute('role', 'dialog');
    popup.setAttribute('aria-label', 'Mixed playtime breakdown');
 
@@ -100,9 +100,9 @@ function openPopup(anchor: HTMLElement, stats: MixStats): void {
       row('Intros skipped', `−${formatClock(stats.introsSkippedMs)}`) +
       row('Outros skipped', `−${formatClock(stats.outrosSkippedMs)}`) +
       row('Transition overlap', `−${formatClock(stats.overlapMs)}`) +
-      '<hr class="sort-bpm-mix-divider">' +
+      '<hr class="mix-tools-mix-divider">' +
       row('Mixed', formatClock(stats.mixedMs), true) +
-      `<p class="sort-bpm-mix-note">${edited}</p>`;
+      `<p class="mix-tools-mix-note">${edited}</p>`;
 
    document.body.appendChild(popup);
 
@@ -128,13 +128,13 @@ const INFO_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" fill="current
 function createLabel(key: string, stats: MixStats): HTMLElement {
    const label = document.createElement('span');
    label.id = LABEL_ID;
-   label.className = 'sort-bpm-mix-time';
+   label.className = 'mix-tools-mix-time';
    label.dataset.key = key;
    label.textContent = ` • ${formatHeaderDuration(stats.mixedMs)} mixed`;
 
    const button = document.createElement('button');
    button.type = 'button';
-   button.className = 'sort-bpm-mix-info';
+   button.className = 'mix-tools-mix-info';
    button.setAttribute('aria-label', 'Show mixed playtime breakdown');
    button.setAttribute('aria-haspopup', 'dialog');
    button.title = 'Mixed playtime breakdown';
@@ -172,7 +172,7 @@ export function ensureMixTime(): void {
       pending = isMixEnabled(uri)
          .then((mixed) => (mixed ? getMixStats(uri) : null))
          .catch((err) => {
-            console.error('[sort-bpm] Could not compute mixed playtime', err);
+            console.error('[mix-tools] Could not compute mixed playtime', err);
             return null;
          });
       cache.set(key, pending);
