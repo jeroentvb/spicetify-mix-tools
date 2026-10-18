@@ -80,7 +80,7 @@ treat as vendored).
 ## What the code does & where the fragile parts live
 
 `src/app.tsx` `main()` is the entry point spicetify-creator loads. See `README.md` for the user-facing
-feature and `TECHNICAL.md` for the reverse-engineering write-up (BPM harvesting via React fiber props,
+feature and `TECHNICAL.md` for the reverse-engineering write-up (where BPM and key come from, the mixing transition APIs,
 and the batched in-place reorder that preserves "date added"). **`TECHNICAL.md` is gitignored** — read
 it locally; it's the most useful doc in the repo.
 
