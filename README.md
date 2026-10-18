@@ -31,10 +31,9 @@ Tracks without the data the chosen mode needs (local files, podcasts, unavailabl
 un-analyzed tracks) are moved to the end rather than being sorted into a wrong position,
 and the count is reported.
 
-> **Note:** the BPM and key values are read from the playlist's own **BPM** and **Key**
-> columns, so the relevant column must be visible before sorting. If it isn't, enable it via
-> the playlist's column/view settings (the "..." / column header menu). With the column
-> hidden there is no data to read, and the extension says so rather than guessing.
+The BPM and key values are the ones Spotify shows in a playlist's **BPM** and **Key**
+columns, including any tempo change made to a track in the mobile app. The columns don't
+need to be visible.
 
 ## Mixed playtime
 
