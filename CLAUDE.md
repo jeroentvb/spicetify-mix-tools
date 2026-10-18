@@ -98,3 +98,6 @@ files — start there, and confirm the new reality by querying the live client o
 - `src/services/mix.ts` — mix-mode detection and the `Spicetify.Platform.PlaylistMixingAPI`
   transition lookups (`getCustomTransitionForTrackPair` / `getAutoTransitionForTrackPair` and the
   `overlap` shape) behind the mixed-playtime label. `getMixStats(uri)` is on `window.mixTools`.
+  Also the improved automix's backend calls: `_automixClient.getComputedTransitions` (ranked
+  candidates per pair) and `setTransitionForTrack` (saving one). The planning itself is in
+  `src/services/automix.ts`; `previewAutomix()` on `window.mixTools` dry-runs it.

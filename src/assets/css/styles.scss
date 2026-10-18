@@ -228,3 +228,124 @@
 .mix-tools-root {
    display: contents;
 }
+
+.mix-tools-backdrop {
+   position: fixed;
+   inset: 0;
+   z-index: 9999;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 16px;
+   background: rgba(0, 0, 0, 0.6);
+   animation: mix-tools-fade-in 0.12s ease;
+}
+
+@keyframes mix-tools-fade-in {
+   from { opacity: 0; }
+   to { opacity: 1; }
+}
+
+.mix-tools-dialog {
+   width: 100%;
+   max-width: 420px;
+   padding: 24px;
+   border-radius: 8px;
+   background: var(--background-elevated-base, #282828);
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+   color: var(--text-base, #fff);
+   animation: mix-tools-fade 0.12s ease;
+
+   .mix-tools-dialog-title {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+      font-weight: 700;
+   }
+
+   .mix-tools-dialog-text {
+      margin: 0 0 16px;
+      font-size: 0.875rem;
+      color: var(--text-subdued, #b3b3b3);
+   }
+
+   .mix-tools-dialog-options {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin: 0 0 20px;
+      padding: 0;
+      border: none;
+   }
+
+   .mix-tools-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover,
+      &--checked {
+         background: var(--background-elevated-highlight, rgba(255, 255, 255, 0.1));
+      }
+
+      input {
+         margin: 2px 0 0;
+         accent-color: var(--text-bright-accent, #1ed760);
+         cursor: pointer;
+      }
+   }
+
+   .mix-tools-option-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+   }
+
+   .mix-tools-option-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+   }
+
+   .mix-tools-option-sub {
+      font-size: 0.75rem;
+      color: var(--text-subdued, #b3b3b3);
+   }
+
+   .mix-tools-dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+   }
+
+   .mix-tools-dialog-button {
+      height: 32px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text-base, #fff);
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+
+      &:hover {
+         transform: scale(1.04);
+      }
+
+      &--primary {
+         background: var(--text-bright-accent, #1ed760);
+         color: #000;
+      }
+   }
+}
+
+.mix-tools-visually-hidden {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   overflow: hidden;
+   clip-path: inset(50%);
+   white-space: nowrap;
+}

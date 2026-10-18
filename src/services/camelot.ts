@@ -39,3 +39,30 @@ export function camelotRank(code: CamelotCode): number {
    // Every CamelotCode is in RANKS by construction; the fallback just keeps this total.
    return RANKS.get(code) ?? 0;
 }
+
+function parseCamelot(code: CamelotCode): { number: number; letter: string } {
+   return { number: parseInt(code, 10), letter: code.slice(-1) };
+}
+
+/**
+ * How rough a mix from one key into the next sounds: 0 for the same key, rising as the
+ * keys get further apart on the wheel. Unlike the sort order this is directional, since a
+ * +2 step ("energy boost") is a classic DJ move and a -2 step isn't.
+ */
+export function harmonicCost(from: CamelotCode, to: CamelotCode): number {
+   const a = parseCamelot(from);
+   const b = parseCamelot(to);
+   const up = (b.number - a.number + 12) % 12;
+   const steps = Math.min(up, 12 - up);
+
+   if (a.letter === b.letter) {
+      if (steps === 0) return 0;
+      if (steps === 1) return 1;
+      if (up === 2) return 3;
+      if (steps === 2) return 4;
+      return 5 + steps;
+   }
+   if (steps === 0) return 1.5; // relative major/minor (8A ↔ 8B)
+   if (steps === 1) return 3.5; // diagonal (8A → 9B)
+   return 6 + steps;
+}

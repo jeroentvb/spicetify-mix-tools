@@ -3,6 +3,7 @@ import { getContents } from './services/playlist';
 import { getTrackData } from './services/audio-attributes';
 import { getCurrentPlaylistUri } from './services/current-uri';
 import { getMixStats } from './services/mix';
+import { previewAutomix } from './services/actions';
 
 import './assets/css/styles.scss';
 
@@ -19,6 +20,7 @@ async function main() {
       getContents,
       getMixStats,
       getTrackData,
+      previewAutomix,
    };
 }
 
