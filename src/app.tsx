@@ -1,6 +1,6 @@
 import { setupInjection } from './components/inject';
 import { getContents } from './services/playlist';
-import { harvestColumnData, inspectRowItem } from './services/track-columns';
+import { getTrackData } from './services/audio-attributes';
 import { getCurrentPlaylistUri } from './services/current-uri';
 import { getMixStats } from './services/mix';
 
@@ -18,8 +18,7 @@ async function main() {
       getCurrentPlaylistUri,
       getContents,
       getMixStats,
-      harvestColumnData,
-      inspectRowItem,
+      getTrackData,
    };
 }
 

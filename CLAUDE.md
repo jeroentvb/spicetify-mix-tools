@@ -46,8 +46,8 @@ only produces a bundle and does **not** exercise the code, so use the client to 
 
   Return plain JSON-serializable values (e.g. `outerHTML.slice(...)`, key lists), not DOM nodes.
 - **To learn about Spotify's internals**, such as a `Platform.*` API shape, whether a global still
-  exists (`Object.keys(Spicetify)`), a DOM node or testid, or a row's fiber props
-  (`window.mixTools.inspectRowItem()`), query the client this way instead of guessing.
+  exists (`Object.keys(Spicetify)`), a DOM node or testid, or a track's BPM/key data
+  (`await window.mixTools.getTrackData(items)`), query the client this way instead of guessing.
 - **To verify a change**, run `npm run build` (it writes into the Spicetify Extensions folder), reload
   the client by evaluating `location.reload()`, wait a few seconds, then query the DOM or
   `window.mixTools`. The button is injected asynchronously, so a check made right after load can miss it.
@@ -89,10 +89,10 @@ files — start there, and confirm the new reality by querying the live client o
 
 - `src/constants/selectors.ts` — DOM selectors / testids (action bar, sort button), as ordered
   candidate lists.
-- `src/services/track-columns.ts` — the track-row selectors and the React-fiber prop shape that
-  BPM and musical key are scraped from (`item.bpm` and `item.key.camelotKey`). Its
-  `inspectRowItem()` is exposed on `window.mixTools` to dump a row's raw props in DevTools,
-  which is the fastest way to re-discover the shape after a client update.
+- `src/services/audio-attributes.ts` — where BPM and musical key come from: the client's
+  metadata-extensions service (`Platform.PlaylistAPI._metadataExtensionsAPI.fetch`), extension
+  kind `AUDIO_ATTRIBUTES_V2` (222), shaped `{ bpm, key: { camelotKey: { value } } }`, times the
+  row's `item.speed` format-list attribute. `getTrackData(items)` is on `window.mixTools`.
 - `src/services/playlist.ts` — `Spicetify.Platform.PlaylistAPI` method names and the modification
   payload shape used for reordering.
 - `src/services/mix.ts` — mix-mode detection and the `Spicetify.Platform.PlaylistMixingAPI`

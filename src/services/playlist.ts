@@ -1,6 +1,6 @@
 import { chunk } from '../utils/chunk';
 import { camelotRank, type CamelotCode } from './camelot';
-import type { RowData } from './track-columns';
+import type { TrackData } from './audio-attributes';
 
 export interface PlaylistItem {
    uri: string;
@@ -59,8 +59,8 @@ export async function canModify(uri: string): Promise<boolean> {
 }
 
 /**
- * Return the playlist ordered for `mode`, using the harvested `uri -> data` map of
- * Spotify's own displayed column values.
+ * Return the playlist ordered for `mode`, using the `uri -> data` map of Spotify's own
+ * BPM and key values (the ones its columns display).
  *
  * Tracks missing the data the mode needs are appended at the end — never silently
  * interleaved into a wrong position. Ties keep the playlist's existing relative order,
@@ -71,7 +71,7 @@ export async function canModify(uri: string): Promise<boolean> {
  */
 export function sortTracks(
    items: PlaylistItem[],
-   data: Map<string, RowData>,
+   data: Map<string, TrackData>,
    mode: SortMode,
    direction: SortDirection,
 ): SortResult {

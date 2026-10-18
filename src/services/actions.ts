@@ -11,7 +11,7 @@ import {
    type SortMode,
    type SortResult,
 } from './playlist';
-import { harvestColumnData } from './track-columns';
+import { getTrackData } from './audio-attributes';
 
 const DIRECTION: SortDirection = 'asc';
 
@@ -20,7 +20,7 @@ interface SortModeSpec {
    mode: SortMode;
    /** Notification prefix, e.g. `Mix Tools: …`. */
    prefix: string;
-   /** What the harvest is reading, for the "reading … for N tracks" notice. */
+   /** What is being fetched, for the "reading … for N tracks" notice. */
    reading: string;
    /** How the resulting order is described in the success summary. */
    order: string;
@@ -40,7 +40,7 @@ const SPECS: Record<SortMode, SortModeSpec> = {
       order: 'by BPM',
       missing: 'without BPM',
       nameSuffix: 'BPM',
-      noData: 'no BPM found — is the BPM column visible on this playlist?',
+      noData: 'Spotify has no BPM for any track in this playlist',
    },
    key: {
       mode: 'key',
@@ -49,7 +49,7 @@ const SPECS: Record<SortMode, SortModeSpec> = {
       order: 'by key + BPM',
       missing: 'without a key',
       nameSuffix: 'Key',
-      noData: 'no musical key found — is the Key column visible on this playlist?',
+      noData: 'Spotify has no musical key for any track in this playlist',
    },
 };
 
@@ -94,7 +94,7 @@ function logOrder(spec: SortModeSpec, result: SortResult): void {
       : { name: item.name ?? item.uri, bpm: item.bpm })));
 }
 
-/** Shared front half: load tracks, harvest BPM + key in one scroll pass, sort. */
+/** Shared front half: load tracks, fetch their BPM + key, sort. */
 async function prepare(uri: string, spec: SortModeSpec): Promise<SortResult | null> {
    const items = await getContents(uri);
    if (items.length === 0) {
@@ -104,8 +104,8 @@ async function prepare(uri: string, spec: SortModeSpec): Promise<SortResult | nu
 
    notify(spec, `reading ${spec.reading} for ${items.length} tracks…`);
    setButtonBusy('0%');
-   const data = await harvestColumnData(items.length, (found, total) => {
-      setButtonBusy(`${Math.min(99, Math.round((found / total) * 100))}%`);
+   const data = await getTrackData(items, (done, total) => {
+      setButtonBusy(`${Math.min(99, Math.round((done / total) * 100))}%`);
    });
 
    const result = sortTracks(items, data, spec.mode, DIRECTION);
