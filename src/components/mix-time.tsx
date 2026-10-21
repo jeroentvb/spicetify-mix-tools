@@ -157,7 +157,8 @@ function MixTime({ stats }: { stats: MixStats }) {
 
    return (
       <>
-         {` • ${formatHeaderDuration(stats.mixedMs)} mixed`}
+         <span className="mix-tools-mix-separator" aria-hidden="true">•</span>
+         {`${formatHeaderDuration(stats.mixedMs)} mixed`}
          <button
             ref={buttonRef}
             type="button"
@@ -178,10 +179,16 @@ function MixTime({ stats }: { stats: MixStats }) {
    );
 }
 
-function createLabel(key: string, stats: MixStats): HTMLElement {
+/**
+ * Newer clients style the playtime element itself (Encore text classes) rather than its
+ * parent, so copy its classes to match its font and color. Not the legacy
+ * `main-entityHeader-*` ones, which `HEADER_FULL_TIME` would then match on our label.
+ */
+function createLabel(key: string, stats: MixStats, fullTime: HTMLElement): HTMLElement {
    const label = document.createElement('span');
    label.id = LABEL_ID;
-   label.className = 'mix-tools-mix-time';
+   const copied = [...fullTime.classList].filter((name) => !name.startsWith('main-entityHeader'));
+   label.className = [...copied, 'mix-tools-mix-time'].join(' ');
    label.dataset.key = key;
    mount(label, <MixTime stats={stats} />);
    return label;
@@ -225,6 +232,6 @@ export function ensureMixTime(): void {
       if (label?.dataset.key === key && label.previousElementSibling === current) return;
 
       unmount(label);
-      if (stats) current.after(createLabel(key, stats));
+      if (stats) current.after(createLabel(key, stats, current));
    });
 }

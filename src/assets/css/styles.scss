@@ -162,8 +162,12 @@
 }
 
 .mix-tools-mix-time {
-   // Plain inline (not flex), so the leading space before the bullet survives.
    white-space: nowrap;
+}
+
+// A bit wider than Spotify's own 4px header separators, to set the two playtimes apart.
+.mix-tools-mix-separator {
+   margin-inline: 6px;
 }
 
 .mix-tools-mix-info {
