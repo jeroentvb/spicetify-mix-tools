@@ -27,6 +27,15 @@ Sort modes:
   ordering keeps them adjacent and consecutive tracks are almost always harmonically
   mixable.
 
+**Reorder this playlist** has a third entry, **Improved automix**, for playlists with
+Spotify's **mix** mode on. It first asks which transition length to go for: **Auto** (the
+default), or **16**, **8** or **4 bars**. It then orders the tracks for harmonic mixing (Camelot neighbours
+first, then tempo, building up through the set), favouring pairs that suit that length.
+Finally it sets a custom transition on every pair, picked from Spotify's own ranked
+suggestions: the chosen length where Spotify rates it well, otherwise half that length.
+**Auto** leaves every pair on Spotify's own top-ranked transition. Each transition can still
+be edited or reset in Spotify's mix editor.
+
 Tracks without the data the chosen mode needs (local files, podcasts, unavailable or
 un-analyzed tracks) are moved to the end rather than being sorted into a wrong position,
 and the count is reported.
