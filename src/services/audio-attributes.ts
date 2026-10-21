@@ -13,6 +13,7 @@
 
 import { chunk } from '../utils/chunk';
 import { asCamelotCode, type CamelotCode } from './camelot';
+import { itemSpeed } from './mix';
 import type { PlaylistItem } from './playlist';
 
 /** `ExtensionKind.AUDIO_ATTRIBUTES_V2` in the client's metadata protobufs. */
@@ -49,16 +50,6 @@ function getMetadataExtensionsAPI(): MetadataExtensionsAPI {
       ?? platform.PlaylistMixingAPI?._metadataExtensionsAPI;
    if (typeof api?.fetch !== 'function') throw new Error('No metadata extensions API found');
    return api;
-}
-
-/**
- * A row's playback speed. The mobile app can speed a track up or down per playlist row,
- * stored as the `item.speed` format-list attribute (e.g. `'1.01562'`).
- */
-function itemSpeed(item: PlaylistItem): number {
-   const attributes = item.formatListAttributes as Record<string, string> | undefined;
-   const speed = parseFloat(attributes?.['item.speed'] ?? '');
-   return Number.isFinite(speed) && speed > 0 ? speed : 1;
 }
 
 /**

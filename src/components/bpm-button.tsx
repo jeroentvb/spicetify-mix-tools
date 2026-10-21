@@ -9,6 +9,7 @@ import {
 } from '../services/actions';
 import { getCurrentPlaylistUri } from '../services/current-uri';
 import { canModify } from '../services/playlist';
+import { openAutomixDialog } from './automix-dialog';
 
 const BUTTON_ID = 'mix-tools-bpm-button';
 
@@ -49,7 +50,14 @@ const ACTIONS: MenuEntry[] = [
    {
       label: 'Reorder this playlist',
       sublabel: 'In place · keeps date added',
-      items: modeLeaves(sortReorderByBpm, sortReorderByKey),
+      items: [
+         ...modeLeaves(sortReorderByBpm, sortReorderByKey),
+         {
+            label: 'Improved automix',
+            sublabel: 'Harmonic order + longer transitions',
+            run: () => void openAutomixDialog(),
+         },
+      ],
       requiresEdit: 'Only for playlists you own',
    },
    {

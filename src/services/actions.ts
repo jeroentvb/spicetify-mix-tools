@@ -1,11 +1,14 @@
 import { setButtonBusy } from '../components/bpm-button';
+import { planAutomix, type BarPreference, type MixTrack } from './automix';
 import { getCurrentPlaylistUri } from './current-uri';
+import { isMixEnabled, pairKey, resetCustomTransition, saveCustomTransition } from './mix';
 import {
    canModify,
    createSortedPlaylist,
    getContents,
    getPlaylistName,
    reorderInPlace,
+   type PlaylistItem,
    sortTracks,
    type SortDirection,
    type SortMode,
@@ -58,7 +61,7 @@ const SPECS: Record<SortMode, SortModeSpec> = {
  * `Spicetify.Snackbar` only exposes `enqueueCustomSnackbar(children, options)` (a headless
  * notistack variant, so we style the element ourselves). Falls back to the console.
  */
-function notify(spec: SortModeSpec, message: string, isError = false): void {
+function notify(spec: Pick<SortModeSpec, 'prefix'>, message: string, isError = false): void {
    const text = `${spec.prefix}: ${message}`;
    const legacy = (Spicetify as { showNotification?: unknown }).showNotification;
    if (typeof legacy === 'function') {
@@ -190,4 +193,126 @@ export function sortToNewPlaylistByBpm(): Promise<void> {
 /** Copy the current playlist into a new one sorted by Camelot key, then BPM. */
 export function sortToNewPlaylistByKey(): Promise<void> {
    return runToNewPlaylist(SPECS.key);
+}
+
+const AUTOMIX = { prefix: 'Improved automix' };
+
+/** Show a progress fraction on the button. */
+function busyPercent(done: number, total: number): void {
+   setButtonBusy(`${Math.min(99, Math.round((done / total) * 100))}%`);
+}
+
+/**
+ * Load the playlist, read BPM + key, and plan the mix. Tracks without both are left out of
+ * the plan and kept at the end, like the sorts do.
+ */
+async function prepareAutomix(uri: string, preference: BarPreference) {
+   const items = await getContents(uri);
+   const data = await getTrackData(items, busyPercent);
+
+   const tracks: (PlaylistItem & MixTrack)[] = [];
+   const skipped: PlaylistItem[] = [];
+   for (const item of items) {
+      const found = data.get(item.uri);
+      if (found?.bpm != null && found.camelotKey != null) {
+         tracks.push({ ...item, bpm: found.bpm, camelotKey: found.camelotKey });
+      } else {
+         skipped.push(item);
+      }
+   }
+
+   const plan = await planAutomix(tracks, preference, busyPercent);
+   return { plan, skipped };
+}
+
+/**
+ * The current playlist, if the improved automix can run on it; otherwise null, after
+ * telling the user why. Checked before asking for a bar length, not after.
+ */
+export async function automixTarget(): Promise<string | null> {
+   const uri = getCurrentPlaylistUri();
+   if (!uri) {
+      notify(AUTOMIX, 'open a playlist first', true);
+      return null;
+   }
+   if (!(await canModify(uri))) {
+      notify(AUTOMIX, 'you can only mix playlists you own', true);
+      return null;
+   }
+   if (!(await isMixEnabled(uri))) {
+      notify(AUTOMIX, 'turn on mixing for this playlist first', true);
+      return null;
+   }
+   return uri;
+}
+
+/**
+ * Reorder a mixed playlist for harmonic mixing and give every pair a transition of the
+ * preferred length. In `'auto'` mode the pairs are left to Spotify's own transitions
+ * instead. See `services/automix.ts`.
+ */
+export async function improvedAutomix(uri: string, preference: BarPreference): Promise<void> {
+   try {
+      notify(AUTOMIX, 'reading key + BPM and rating transitions…');
+      setButtonBusy('0%');
+      const { plan, skipped } = await prepareAutomix(uri, preference);
+      if (plan.ordered.length < 2) {
+         return notify(AUTOMIX, 'not enough tracks with both a key and a BPM', true);
+      }
+
+      await reorderInPlace(uri, [...plan.ordered, ...skipped], busyPercent);
+
+      // Read the rows back: a reorder that fell back to re-adding gives them new uids.
+      const rows = await getContents(uri);
+      const pairs = rows.slice(0, -1).flatMap((a, i) => {
+         const b = rows[i + 1];
+         const transition = plan.transitions.get(pairKey(a.uri, b.uri));
+         return transition ? [{ a, b, transition }] : [];
+      });
+
+      let preferred = 0;
+      for (let i = 0; i < pairs.length; i++) {
+         const { a, b, transition } = pairs[i];
+         if (preference === 'auto') {
+            // Leave the pair automatic, clearing any hand-edited transition from an earlier run.
+            await resetCustomTransition(uri, a, b);
+         } else {
+            await saveCustomTransition(uri, a, b, transition);
+            if (transition.overlap.durationBars === preference) preferred++;
+         }
+         busyPercent(i + 1, pairs.length);
+      }
+
+      const base = preference === 'auto'
+         ? `mixed ${plan.ordered.length} tracks with Spotify's own transitions`
+         : `mixed ${plan.ordered.length} tracks · ${preferred}× ${preference}-bar, ${pairs.length - preferred}× shorter transitions`;
+      notify(AUTOMIX, skipped.length > 0 ? `${base} · ${skipped.length} without key/BPM moved to end` : base);
+   } catch (err) {
+      console.error('Improved automix failed:', err);
+      notify(AUTOMIX, 'failed to mix playlist (see console)', true);
+   } finally {
+      setButtonBusy(null);
+   }
+}
+
+/**
+ * Plan the improved automix for the current playlist without changing anything, and log
+ * the result. A devtools helper on `window.mixTools`.
+ */
+export async function previewAutomix(preference: BarPreference = 'auto'): Promise<unknown[]> {
+   const uri = getCurrentPlaylistUri();
+   if (!uri) return [];
+
+   try {
+      const { plan } = await prepareAutomix(uri, preference);
+      const table = plan.ordered.map((track, i) => {
+         const next = plan.ordered[i + 1];
+         const transition = next ? plan.transitions.get(pairKey(track.uri, next.uri)) : undefined;
+         return { name: track.name, bpm: track.bpm, key: track.camelotKey, bars: transition?.overlap.durationBars ?? null };
+      });
+      console.table(table);
+      return table;
+   } finally {
+      setButtonBusy(null);
+   }
 }
