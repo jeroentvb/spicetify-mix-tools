@@ -202,11 +202,18 @@ function busyPercent(done: number, total: number): void {
    setButtonBusy(`${Math.min(99, Math.round((done / total) * 100))}%`);
 }
 
+/** Rows (by uid) to pin to the start and/or end of the mix. */
+export interface AutomixPins {
+   first?: string;
+   last?: string;
+}
+
 /**
  * Load the playlist, read BPM + key, and plan the mix. Tracks without both are left out of
- * the plan and kept at the end, like the sorts do.
+ * the plan and kept at the end, like the sorts do. A pinned track goes first or last in the
+ * mix either way; without key/BPM it just isn't planned around.
  */
-async function prepareAutomix(uri: string, preference: BarPreference) {
+async function prepareAutomix(uri: string, preference: BarPreference, pins: AutomixPins = {}) {
    const items = await getContents(uri);
    const data = await getTrackData(items, busyPercent);
 
@@ -221,8 +228,22 @@ async function prepareAutomix(uri: string, preference: BarPreference) {
       }
    }
 
-   const plan = await planAutomix(tracks, preference, busyPercent);
-   return { plan, skipped };
+   const index = (uid?: string) => {
+      const i = uid ? tracks.findIndex((track) => track.uid === uid) : -1;
+      return i === -1 ? undefined : i;
+   };
+   const unplanned = (uid?: string) => (uid ? skipped.find((item) => item.uid === uid) : undefined);
+   const first = unplanned(pins.first);
+   const last = unplanned(pins.last);
+
+   const plan = await planAutomix(tracks, preference, busyPercent, { first: index(pins.first), last: index(pins.last) });
+   const order = [
+      ...(first ? [first] : []),
+      ...plan.ordered,
+      ...(last ? [last] : []),
+      ...skipped.filter((item) => item !== first && item !== last),
+   ];
+   return { plan, order, skipped: skipped.length - (first ? 1 : 0) - (last ? 1 : 0) };
 }
 
 /**
@@ -251,16 +272,16 @@ export async function automixTarget(): Promise<string | null> {
  * preferred length. In `'auto'` mode the pairs are left to Spotify's own transitions
  * instead. See `services/automix.ts`.
  */
-export async function improvedAutomix(uri: string, preference: BarPreference): Promise<void> {
+export async function improvedAutomix(uri: string, preference: BarPreference, pins: AutomixPins = {}): Promise<void> {
    try {
       notify(AUTOMIX, 'reading key + BPM and rating transitions…');
       setButtonBusy('0%');
-      const { plan, skipped } = await prepareAutomix(uri, preference);
+      const { plan, order, skipped } = await prepareAutomix(uri, preference, pins);
       if (plan.ordered.length < 2) {
          return notify(AUTOMIX, 'not enough tracks with both a key and a BPM', true);
       }
 
-      await reorderInPlace(uri, [...plan.ordered, ...skipped], busyPercent);
+      await reorderInPlace(uri, order, busyPercent);
 
       // Read the rows back: a reorder that fell back to re-adding gives them new uids.
       const rows = await getContents(uri);
@@ -286,7 +307,7 @@ export async function improvedAutomix(uri: string, preference: BarPreference): P
       const base = preference === 'auto'
          ? `mixed ${plan.ordered.length} tracks with Spotify's own transitions`
          : `mixed ${plan.ordered.length} tracks · ${preferred}× ${preference}-bar, ${pairs.length - preferred}× shorter transitions`;
-      notify(AUTOMIX, skipped.length > 0 ? `${base} · ${skipped.length} without key/BPM moved to end` : base);
+      notify(AUTOMIX, skipped > 0 ? `${base} · ${skipped} without key/BPM moved to end` : base);
    } catch (err) {
       console.error('Improved automix failed:', err);
       notify(AUTOMIX, 'failed to mix playlist (see console)', true);
@@ -299,12 +320,12 @@ export async function improvedAutomix(uri: string, preference: BarPreference): P
  * Plan the improved automix for the current playlist without changing anything, and log
  * the result. A devtools helper on `window.mixTools`.
  */
-export async function previewAutomix(preference: BarPreference = 'auto'): Promise<unknown[]> {
+export async function previewAutomix(preference: BarPreference = 'auto', pins: AutomixPins = {}): Promise<unknown[]> {
    const uri = getCurrentPlaylistUri();
    if (!uri) return [];
 
    try {
-      const { plan } = await prepareAutomix(uri, preference);
+      const { plan } = await prepareAutomix(uri, preference, pins);
       const table = plan.ordered.map((track, i) => {
          const next = plan.ordered[i + 1];
          const transition = next ? plan.transitions.get(pairKey(track.uri, next.uri)) : undefined;

@@ -1,7 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 
 import type { BarPreference } from '../services/automix';
-import { automixTarget, improvedAutomix } from '../services/actions';
+import { automixTarget, improvedAutomix, type AutomixPins } from '../services/actions';
+import { getContents, type PlaylistItem } from '../services/playlist';
 import { mount, unmount } from '../utils/mount';
 
 const STORAGE_KEY = 'mix-tools:automix-bars';
@@ -41,16 +42,52 @@ function savePreference(value: BarPreference): void {
 
 /** Every element Tab can reach inside `root`, in order. */
 function focusables(root: HTMLElement): HTMLElement[] {
-   return Array.from(root.querySelectorAll<HTMLElement>('input:checked, button:not(:disabled)'));
+   return Array.from(root.querySelectorAll<HTMLElement>('input:checked, select, button:not(:disabled)'));
+}
+
+/** "Title — Artist, Artist", for the start/end pickers. */
+function trackLabel(item: PlaylistItem): string {
+   const artists = Array.isArray(item.artists)
+      ? (item.artists as { name?: string }[]).map((artist) => artist.name).filter(Boolean).join(', ')
+      : '';
+   const name = item.name ?? item.uri;
+   return artists ? `${name} — ${artists}` : name;
+}
+
+interface TrackPickerProps {
+   label: string;
+   items: PlaylistItem[];
+   value: string;
+   /** The uid picked in the other picker, which can't be picked here too. */
+   taken: string;
+   onChange: (uid: string) => void;
+}
+
+function TrackPicker({ label, items, value, taken, onChange }: TrackPickerProps) {
+   const id = useId();
+   return (
+      <div className="mix-tools-picker">
+         <label htmlFor={id} className="mix-tools-picker-label">{label}</label>
+         <select id={id} className="mix-tools-picker-select" value={value} onChange={(e) => onChange(e.target.value)}>
+            <option value="">Any track</option>
+            {items.map((item) => (
+               <option key={item.uid} value={item.uid} disabled={item.uid === taken}>{trackLabel(item)}</option>
+            ))}
+         </select>
+      </div>
+   );
 }
 
 interface DialogProps {
-   onConfirm: (preference: BarPreference) => void;
+   items: PlaylistItem[];
+   onConfirm: (preference: BarPreference, pins: AutomixPins) => void;
    onClose: () => void;
 }
 
-function AutomixDialog({ onConfirm, onClose }: DialogProps) {
+function AutomixDialog({ items, onConfirm, onClose }: DialogProps) {
    const [preference, setPreference] = useState<BarPreference>(loadPreference);
+   const [first, setFirst] = useState('');
+   const [last, setLast] = useState('');
    const dialogRef = useRef<HTMLFormElement>(null);
    const titleId = useId();
    const descriptionId = useId();
@@ -101,7 +138,7 @@ function AutomixDialog({ onConfirm, onClose }: DialogProps) {
             onSubmit={(e) => {
                e.preventDefault();
                savePreference(preference);
-               onConfirm(preference);
+               onConfirm(preference, { first: first || undefined, last: last || undefined });
             }}
          >
             <h2 id={titleId} className="mix-tools-dialog-title">Improved automix</h2>
@@ -131,6 +168,12 @@ function AutomixDialog({ onConfirm, onClose }: DialogProps) {
                ))}
             </fieldset>
 
+            <fieldset className="mix-tools-dialog-pickers">
+               <legend className="mix-tools-dialog-text">Optionally, pick the tracks the mix starts and ends with.</legend>
+               <TrackPicker label="Start with" items={items} value={first} taken={last} onChange={setFirst} />
+               <TrackPicker label="End with" items={items} value={last} taken={first} onChange={setLast} />
+            </fieldset>
+
             <div className="mix-tools-dialog-actions">
                <button type="button" className="mix-tools-dialog-button" onClick={onClose}>Cancel</button>
                <button type="submit" className="mix-tools-dialog-button mix-tools-dialog-button--primary">
@@ -149,6 +192,7 @@ function AutomixDialog({ onConfirm, onClose }: DialogProps) {
 export async function openAutomixDialog(): Promise<void> {
    const uri = await automixTarget();
    if (!uri) return;
+   const items = await getContents(uri);
 
    // Its own root on <body>: the dialog isn't tied to the action bar, which Spotify re-renders.
    const host = document.createElement('div');
@@ -163,10 +207,11 @@ export async function openAutomixDialog(): Promise<void> {
 
    mount(host, (
       <AutomixDialog
+         items={items}
          onClose={close}
-         onConfirm={(preference) => {
+         onConfirm={(preference, pins) => {
             close();
-            void improvedAutomix(uri, preference);
+            void improvedAutomix(uri, preference, pins);
          }}
       />
    ));

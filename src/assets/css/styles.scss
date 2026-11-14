@@ -317,6 +317,50 @@
       color: var(--text-subdued, #b3b3b3);
    }
 
+   .mix-tools-dialog-pickers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0 0 20px;
+      padding: 0;
+      border: none;
+
+      legend {
+         margin-bottom: 8px;
+         padding: 0;
+      }
+   }
+
+   .mix-tools-picker {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+   }
+
+   .mix-tools-picker-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+   }
+
+   .mix-tools-picker-select {
+      width: 100%;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--essential-subdued, #727272);
+      border-radius: 4px;
+      background: var(--background-elevated-highlight, #3e3e3e);
+      color: var(--text-base, #fff);
+      font-size: 0.875rem;
+      text-overflow: ellipsis;
+      cursor: pointer;
+
+      &:focus-visible {
+         outline: 2px solid var(--text-base, #fff);
+         outline-offset: 1px;
+      }
+   }
+
    .mix-tools-dialog-actions {
       display: flex;
       justify-content: flex-end;

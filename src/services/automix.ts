@@ -24,6 +24,12 @@ export interface MixTrack {
    formatListAttributes?: unknown;
 }
 
+/** Tracks to pin to the start and/or end of the mix, as indices into the planned tracks. */
+export interface AutomixEnds {
+   first?: number;
+   last?: number;
+}
+
 export interface AutomixPlan<T extends MixTrack> {
    ordered: T[];
    /** Chosen transition per consecutive pair, by `pairKey`. Absent pairs keep Spotify's own. */
@@ -122,15 +128,19 @@ function trackPair(a: MixTrack, b: MixTrack): TrackPair {
    return { a: a.uri, b: b.uri, speedA: itemSpeed(a), speedB: itemSpeed(b) };
 }
 
-/** Which ordered pairs to ask the backend about: each track's cheapest successors by key and tempo. */
-function pairsToFetch(tracks: MixTrack[]): TrackPair[] {
+/**
+ * Which ordered pairs to ask the backend about: each track's cheapest successors by key and
+ * tempo. Pairs into a pinned first track or out of a pinned last one can't occur, so skip them.
+ */
+function pairsToFetch(tracks: MixTrack[], ends: AutomixEnds): TrackPair[] {
    const n = tracks.length;
    const successors = Math.min(n - 1, Math.max(MIN_SUCCESSORS, Math.floor(MAX_FETCHED_PAIRS / n)));
    const pairs: TrackPair[] = [];
 
-   tracks.forEach((a) => {
+   tracks.forEach((a, i) => {
+      if (i === ends.last) return;
       tracks
-         .filter((b) => b.uri !== a.uri)
+         .filter((b, j) => b.uri !== a.uri && j !== ends.first)
          .map((b) => ({ b, cost: harmonicCost(a.camelotKey, b.camelotKey) + tempoCost(a.bpm, b.bpm) }))
          .sort((x, y) => x.cost - y.cost)
          .slice(0, successors)
@@ -152,22 +162,36 @@ function edgeSum(cost: Float64Array, n: number, at: (k: number) => number, edges
  * Cheapest path through all tracks (an asymmetric travelling-salesman path) by simulated
  * annealing over two moves, swapping two tracks and moving one track elsewhere. Both
  * have O(1) cost deltas, so a few hundred thousand steps take well under a second.
+ * Pinned tracks stay at the ends: moves only pick positions in between.
  */
-function anneal(cost: Float64Array, n: number): number[] {
+function anneal(cost: Float64Array, n: number, ends: AutomixEnds): number[] {
    const total = (p: number[]) => edgeSum(cost, n, (k) => p[k], p.keys());
    const iterations = Math.min(500_000, Math.max(50_000, n * 4000));
    const cooling = Math.pow(END_TEMPERATURE / START_TEMPERATURE, 1 / iterations);
 
+   // The free positions are lo..hi; the pinned tracks sit just outside them.
+   const lo = ends.first != null ? 1 : 0;
+   const hi = ends.last != null ? n - 2 : n - 1;
+   const span = hi - lo + 1;
+   const free = [...Array(n).keys()].filter((k) => k !== ends.first && k !== ends.last);
+   const shuffled = () => [
+      ...(ends.first != null ? [ends.first] : []),
+      ...[...free].sort(() => Math.random() - 0.5),
+      ...(ends.last != null ? [ends.last] : []),
+   ];
+
+   if (span < 2) return shuffled();
+
    let best: { order: number[]; cost: number } | null = null;
 
    for (let restart = 0; restart < ANNEAL_RESTARTS; restart++) {
-      const p = [...Array(n).keys()].sort(() => Math.random() - 0.5);
+      const p = shuffled();
       let current = total(p);
       let temperature = START_TEMPERATURE;
 
       for (let step = 0; step < iterations; step++, temperature *= cooling) {
-         const i = Math.floor(Math.random() * n);
-         const j = Math.floor(Math.random() * n);
+         const i = lo + Math.floor(Math.random() * span);
+         const j = lo + Math.floor(Math.random() * span);
          if (i === j) continue;
 
          const swap = Math.random() < 0.5;
@@ -208,16 +232,19 @@ function anneal(cost: Float64Array, n: number): number[] {
 /**
  * Work out the mix order and the transition for each pair. Talks to Spotify's backend for
  * the transition candidates but changes nothing; applying the plan is up to the caller.
+ * `ends` optionally pins a track to the start and/or end of the mix.
  */
 export async function planAutomix<T extends MixTrack>(
    tracks: T[],
    preference: BarPreference,
    onProgress?: (done: number, total: number) => void,
+   ends: AutomixEnds = {},
 ): Promise<AutomixPlan<T>> {
    const n = tracks.length;
    if (n < 2) return { ordered: [...tracks], transitions: new Map() };
+   if (ends.first != null && ends.first === ends.last) throw new Error('first and last track must differ');
 
-   const candidates = await getTransitionCandidates(pairsToFetch(tracks), onProgress);
+   const candidates = await getTransitionCandidates(pairsToFetch(tracks, ends), onProgress);
 
    const cost = new Float64Array(n * n);
    tracks.forEach((a, i) => tracks.forEach((b, j) => {
@@ -229,7 +256,7 @@ export async function planAutomix<T extends MixTrack>(
       cost[i * n + j] = harmonicCost(a.camelotKey, b.camelotKey) + tempoCost(a.bpm, b.bpm) + backend;
    }));
 
-   const ordered = anneal(cost, n).map((i) => tracks[i]);
+   const ordered = anneal(cost, n, ends).map((i) => tracks[i]);
 
    // The order may use a pair we only estimated; fetch those before picking transitions.
    const consecutive = ordered.slice(0, -1).map((a, i) => trackPair(a, ordered[i + 1]));
